@@ -1,5 +1,7 @@
 import React from "react";
+import PropTypes from 'prop-types';
 import Book from "./Book";
+
 
 const BookShelf = ({ title, books, onMoveBook }) => {
   return (
@@ -14,6 +16,22 @@ const BookShelf = ({ title, books, onMoveBook }) => {
       </div>
     </div>
   );
+};
+
+BookShelf.propTypes = {
+  title: PropTypes.string.isRequired,
+  books: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      title: PropTypes.string.isRequired,
+      authors: PropTypes.arrayOf(PropTypes.string),
+      shelf: PropTypes.string,
+      imageLinks: PropTypes.shape({
+        thumbnail: PropTypes.string,
+      }),
+    })
+  ).isRequired,
+  onMoveBook: PropTypes.func.isRequired,
 };
 
 export default BookShelf;

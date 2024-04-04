@@ -1,4 +1,16 @@
 import React from "react";
+import PropTypes from "prop-types";
+
+const shelves = [
+  {
+    id: "1",
+    shelfName: "currentlyReading",
+    shelfDisplayName: "Currently Reading",
+  },
+  { id: "2", shelfName: "wantToRead", shelfDisplayName: "Want to Read" },
+  { id: "3", shelfName: "read", shelfDisplayName: "Read" },
+  { id: "4", shelfName: "none", shelfDisplayName: "None" },
+];
 
 const Book = ({ book, onMoveBook }) => {
   const handleChange = (e) => {
@@ -24,13 +36,14 @@ const Book = ({ book, onMoveBook }) => {
           ></div>
           <div className="book-shelf-changer">
             <select value={book.shelf} onChange={handleChange}>
-              <option value="none" disabled>
+              <option disabled>
                 Move to...
               </option>
-              <option value="currentlyReading">Currently Reading</option>
-              <option value="wantToRead">Want to Read</option>
-              <option value="read">Read</option>
-              <option value="none">None</option>
+              {shelves.map((shelf) => (
+                <option key={shelf.id} value={shelf.shelfName}>
+                  {shelf.shelfDisplayName}
+                </option>
+              ))}
             </select>
           </div>
         </div>
@@ -43,6 +56,18 @@ const Book = ({ book, onMoveBook }) => {
       </div>
     </li>
   );
+};
+
+Book.propTypes = {
+  book: PropTypes.shape({
+    title: PropTypes.string.isRequired,
+    authors: PropTypes.arrayOf(PropTypes.string),
+    shelf: PropTypes.string,
+    imageLinks: PropTypes.shape({
+      thumbnail: PropTypes.string,
+    }),
+  }).isRequired,
+  onMoveBook: PropTypes.func.isRequired,
 };
 
 export default Book;

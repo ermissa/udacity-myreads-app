@@ -1,34 +1,41 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import * as BooksAPI from "./BooksAPI";
 import Book from "./Book";
 import { Link } from "react-router-dom";
+import debounce from "lodash.debounce";
 
 const SearchBooks = ({ onMoveBook, currentBooks }) => {
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
 
+  const debouncedSearchBooks = debounce((nextQuery) => {
+    if (!nextQuery.trim()) {
+      setSearchResults([]);
+      return;
+    }
+    BooksAPI.search(nextQuery).then((results) => {
+      if (results.error) {
+        setSearchResults([]);
+      } else {
+        const updatedResults = results.map((result) => {
+          const match = currentBooks.find((book) => book.id === result.id);
+          result.shelf = match ? match.shelf : "none";
+          return result;
+        });
+        setSearchResults(updatedResults);
+      }
+    });
+  }, 500);
+
+  useEffect(() => {
+    debouncedSearchBooks(query);
+    return () => {
+      debouncedSearchBooks.cancel();
+    };
+  }, [query, debouncedSearchBooks]);
+
   const updateQuery = (query) => {
     setQuery(query);
-    searchBooks(query);
-  };
-
-  const searchBooks = (query) => {
-    if (query.length > 0) {
-      BooksAPI.search(query).then((results) => {
-        if (results.error) {
-          setSearchResults([]);
-        } else {
-          const updatedResults = results.map((result) => {
-            const match = currentBooks.find((book) => book.id === result.id);
-            result.shelf = match ? match.shelf : "none";
-            return result;
-          });
-          setSearchResults(updatedResults);
-        }
-      });
-    } else {
-      setSearchResults([]);
-    }
   };
 
   return (
